@@ -10,7 +10,7 @@ langchain-core==0.3.29
 langgraph==0.2.62
 langchain-groq==0.2.3
 # Provedores de fallback (multi-LLM) — opcionais, ativados por env:
-langchain-openai==0.2.14
+langchain-openai==1.1.14
 langchain-anthropic==0.3.1
 langchain-google-genai==2.0.8
 
