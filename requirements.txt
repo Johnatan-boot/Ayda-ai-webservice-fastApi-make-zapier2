@@ -1,0 +1,28 @@
+# ── API ──────────────────────────────────────────────────────────
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.1
+
+# ── Orquestração de agentes / LLM ────────────────────────────────
+langchain==0.3.14
+langchain-core==0.3.29
+langgraph==0.2.62
+langchain-groq==0.2.3
+# Provedores de fallback (multi-LLM) — opcionais, ativados por env:
+langchain-openai==0.2.14
+langchain-anthropic==0.3.1
+langchain-google-genai==2.0.8
+
+# ── RAG ──────────────────────────────────────────────────────────
+langchain-chroma==0.1.4
+langchain-huggingface==0.1.2
+sentence-transformers==3.3.1
+
+# ── Banco de dados (somente leitura na operação) ─────────────────
+sqlalchemy==2.0.36
+pymysql==1.1.1
+
+# ── Utilidades ───────────────────────────────────────────────────
+python-dotenv==1.0.1
+tenacity==9.0.0
