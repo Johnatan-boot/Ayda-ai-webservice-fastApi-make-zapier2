@@ -1,0 +1,12 @@
+@"
+services:
+  - type: web
+    name: ayda-ai-service
+    runtime: python
+    pythonVersion: "3.11"
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port `$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+"@ | Out-File -FilePath "render.yaml" -Encoding UTF8
