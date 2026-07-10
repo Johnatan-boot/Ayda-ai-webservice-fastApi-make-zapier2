@@ -43,8 +43,22 @@ class AydaAgent:
         return graph.compile()
 
     def invoke(self, messages: list) -> dict:
-     """Recebe mensagens oLangChain e devolve o estado final."""
-     return self._app.invoke(
-        {"messages": messages},
-        config={"recursion_limit": 50}
-    )
+        """Recebe mensagens LangChain e devolve o estado final (modo síncrono, sem streaming)."""
+        return self._app.invoke(
+            {"messages": messages},
+            config={"recursion_limit": 50}
+        )
+
+    def stream_eventos(self, messages: list):
+        """Gera atualizações incrementais do grafo, nó a nó (modo streaming).
+
+        A cada passo do LangGraph (nó 'agente' decidindo, nó 'tools' executando
+        uma automação), este generator emite o update correspondente. É isso que
+        permite ao frontend "ver" a automação acontecendo em tempo real, em vez
+        de esperar em silêncio pela resposta final.
+        """
+        yield from self._app.stream(
+            {"messages": messages},
+            config={"recursion_limit": 50},
+            stream_mode="updates",
+        )

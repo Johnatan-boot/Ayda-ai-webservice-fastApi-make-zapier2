@@ -1,0 +1,30 @@
+# ── Servidor ─────────────────────────────────────────────────────
+APP_ENV=development
+APP_PORT=8000
+LOG_LEVEL=INFO
+CORS_ORIGINS=http://localhost:3000,https://kingstar-intelligence-frontend.onrender.com
+
+# ── LLM principal (Groq) ─────────────────────────────────────────
+LLM_PROVIDER=groq
+GROQ_API_KEY=
+GROQ_MODEL=llama-3.3-70b-versatile
+
+# ── Provedores de fallback (opcionais) ───────────────────────────
+OPENAI_API_KEY=
+ANTHROPIC_API_KEY=
+GOOGLE_API_KEY=
+
+# ── RAG ──────────────────────────────────────────────────────────
+EMBEDDING_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+VECTOR_DIR=./data/chroma
+KNOWLEDGE_DIR=./data/knowledge
+
+# ── Banco da operação KingStar (somente leitura) ─────────────────
+DB_HOST=
+DB_PORT=3306
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+
+# Automacao (Make / n8n) - cole aqui a URL do Custom Webhook
+MAKE_WEBHOOK_URL=

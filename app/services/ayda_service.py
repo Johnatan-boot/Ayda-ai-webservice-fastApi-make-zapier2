@@ -31,6 +31,72 @@ class AydaService:
     },
 )
 
+    def conversar_stream(
+        self,
+        pergunta: str,
+        historico: list[MensagemChat] | None = None,
+        contexto: ContextoUsuario | None = None,
+    ):
+        """Versão streaming de `conversar`: emite eventos incrementais conforme
+        o agente decide usar ferramentas (automações) e conforme cada uma
+        termina, além do evento final com a resposta completa.
+
+        Cada evento é um dict com `tipo` e `dados`, pronto para ser serializado
+        como SSE pela rota HTTP.
+        """
+        mensagens = self._montar_mensagens(pergunta, historico or [])
+
+        yield {
+            "tipo": "inicio",
+            "dados": {"mensagem": "Ayda recebeu a pergunta e está analisando..."},
+        }
+
+        ferramentas_usadas: list[str] = []
+        resposta_final = ""
+
+        for update in self._container.agent.stream_eventos(mensagens):
+            for node_name, node_output in update.items():
+                msgs = (node_output or {}).get("messages", [])
+
+                if node_name == "agente":
+                    for m in msgs:
+                        tool_calls = getattr(m, "tool_calls", None) or []
+                        if tool_calls:
+                            for tc in tool_calls:
+                                nome = tc.get("name") if isinstance(tc, dict) else getattr(tc, "name", None)
+                                args = tc.get("args") if isinstance(tc, dict) else getattr(tc, "args", None)
+                                if nome:
+                                    ferramentas_usadas.append(nome)
+                                yield {
+                                    "tipo": "ferramenta_iniciada",
+                                    "dados": {"ferramenta": nome, "argumentos": args},
+                                }
+                        elif getattr(m, "content", None):
+                            resposta_final = m.content
+
+                elif node_name == "tools":
+                    for m in msgs:
+                        nome = getattr(m, "name", None)
+                        conteudo = getattr(m, "content", "")
+                        preview = conteudo if isinstance(conteudo, str) else str(conteudo)
+                        if len(preview) > 400:
+                            preview = preview[:400] + "…"
+                        yield {
+                            "tipo": "ferramenta_concluida",
+                            "dados": {"ferramenta": nome, "resultado_preview": preview},
+                        }
+
+        yield {
+            "tipo": "resposta_final",
+            "dados": {
+                "resposta": resposta_final,
+                "ferramentas_usadas": ferramentas_usadas,
+                "metadados": {
+                    "papel": contexto.funcao if contexto else "N/A",
+                },
+            },
+        }
+
     def ingerir_conhecimento(self) -> int:
         return self._container.retriever.ingerir()  # type: ignore[attr-defined]
 
