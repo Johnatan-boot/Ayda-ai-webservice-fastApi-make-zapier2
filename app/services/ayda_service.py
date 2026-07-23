@@ -14,7 +14,7 @@ class AydaService:
         pergunta: str,
         historico: list[MensagemChat] | None = None,
         contexto: ContextoUsuario | None = None,
-    ) -> RespostaAgente:  
+    ) -> RespostaAgente:
         mensagens = self._montar_mensagens(pergunta, historico or [])
         estado = self._container.agent.invoke(mensagens)
 
@@ -23,13 +23,13 @@ class AydaService:
         ferramentas = self._extrair_ferramentas(msgs)
 
         return RespostaAgente(
-    resposta=resposta,
-    ferramentas_usadas=ferramentas,
-    metadados={
-        "papel": contexto.funcao if contexto else "N/A",
-        "ferramentas_disponiveis": self.listar_ferramentas()
-    },
-)
+            resposta=resposta,
+            ferramentas_usadas=ferramentas,
+            metadados={
+                "papel": contexto.funcao if contexto else "N/A",
+                "ferramentas_disponiveis": self.listar_ferramentas(),
+            },
+        )
 
     def conversar_stream(
         self,
@@ -100,6 +100,9 @@ class AydaService:
     def ingerir_conhecimento(self) -> int:
         return self._container.retriever.ingerir()  # type: ignore[attr-defined]
 
+    def listar_ferramentas(self) -> list[str]:
+        return [tool.name for tool in self._container.agent.tools]
+
     @staticmethod
     def _montar_mensagens(pergunta: str, historico: list[MensagemChat]):
         msgs = []
@@ -107,9 +110,6 @@ class AydaService:
             msgs.append(HumanMessage(m.conteudo) if m.papel == "user" else AIMessage(m.conteudo))
         msgs.append(HumanMessage(pergunta))
         return msgs
-
-    def listar_ferramentas(self):
-        return [tool.name for tool in self._container.agent._tools]    
 
     @staticmethod
     def _extrair_ferramentas(msgs) -> list[str]:

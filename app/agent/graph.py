@@ -5,8 +5,6 @@ e retorna ao 'agente'; quando não houver mais chamadas, finaliza.
 
    START → agente → (tools? ) → agente → ... → END
 """
-from pyexpat.errors import messages
-
 from langchain_core.messages import SystemMessage
 from langgraph.graph import START, END, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
@@ -23,6 +21,11 @@ class AydaAgent:
         self._tools = tools
         self._llm = chat_model.bind_tools(tools)
         self._app = self._build_graph()
+
+    @property
+    def tools(self):
+        """Lista de ferramentas (tools) disponiveis para o agente."""
+        return self._tools
 
     def _build_graph(self):
         graph = StateGraph(EstadoAgente)

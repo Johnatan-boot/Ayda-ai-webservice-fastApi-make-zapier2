@@ -48,11 +48,10 @@ def chat_stream(req: ChatRequest, service: AydaService = Depends(get_service)):
     que o backend Node.js consome e repassa ao frontend para que a janela
     da Ayda mostre a automação acontecendo em tempo real.
     """
-    contexto = ContextoUsuario(**req.contexto.model_dump()) if req.contexto else None
-    historico = [MensagemChat(m.papel, m.conteudo) for m in req.historico]
-
     def gerar():
         try:
+            contexto = ContextoUsuario(**req.contexto.model_dump()) if req.contexto else None
+            historico = [MensagemChat(m.papel, m.conteudo) for m in req.historico]
             for evento in service.conversar_stream(req.pergunta, historico, contexto):
                 yield f"data: {json.dumps(evento, ensure_ascii=False)}\n\n"
         except AydaError as exc:

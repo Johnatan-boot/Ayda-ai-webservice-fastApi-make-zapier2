@@ -39,6 +39,10 @@ class ChromaKnowledgeRetriever(KnowledgeRetriever):
         chunks = splitter.split_documents(docs)
 
         store = self._get_store()
+        ids_existentes = store.get().get("ids", [])
+        if ids_existentes:
+            store.delete(ids=ids_existentes)
+            logger.info("RAG: %d fragmentos antigos removidos antes de reindexar.", len(ids_existentes))
         store.add_documents(chunks)
         logger.info("RAG indexado: %d arquivos, %d fragmentos.", len(arquivos), len(chunks))
         return len(chunks)
